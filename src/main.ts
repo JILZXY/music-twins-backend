@@ -1,0 +1,25 @@
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
+import { ZodValidationPipe } from 'nestjs-zod';
+import { GlobalExceptionFilter } from './shared/presentation/filters/global-exception.filter';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  app.setGlobalPrefix('api/v1');
+  app.use(helmet());
+  app.use(cookieParser());
+
+  app.enableCors({
+    origin: ['http://localhost:3000'],
+    credentials: true,
+  });
+
+  app.useGlobalPipes(new ZodValidationPipe());
+  app.useGlobalFilters(new GlobalExceptionFilter());
+
+  await app.listen(process.env.PORT ?? 3000);
+}
+bootstrap();
