@@ -11,9 +11,9 @@ export class PostgresFeedRepository implements FeedRepository {
   async getFeedItems(userId: string, friendId?: string, limit: number = 20): Promise<{ items: FeedItem[]; nextCursor: string | null }> {
     let filterCondition = `
       pe.user_id = $1 OR pe.user_id IN (
-        SELECT CASE WHEN user_id = $1 THEN friend_id ELSE user_id END
+        SELECT CASE WHEN user_id = $1 THEN friend_user_id ELSE user_id END
         FROM friends
-        WHERE (user_id = $1 OR friend_id = $1) AND status = 'ACCEPTED'
+        WHERE (user_id = $1 OR friend_user_id = $1) AND status = 'ACCEPTED'
       )
     `;
     const params: any[] = [userId, limit];
@@ -25,8 +25,8 @@ export class PostgresFeedRepository implements FeedRepository {
       SELECT 
         pe.id AS "playbackEventId",
         pe.track_id AS "trackId",
-        pe.name AS "trackName",
-        pe.artist AS "trackArtist",
+        pe.track_name AS "trackName",
+        pe.artist_name AS "trackArtist",
         pe.album_name AS "albumName",
         pe.album_image_url AS "albumImageUrl",
         pe.played_at AS "playedAt",

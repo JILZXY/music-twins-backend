@@ -42,7 +42,7 @@ export class AuthService {
     } else {
       const userId = uuidv4();
       const avatarUrl = profile.images && profile.images.length > 0 ? profile.images[0].url : null;
-      user = new User(userId, profile.display_name, avatarUrl, new Date(), new Date());
+      user = new User(userId, profile.id, profile.display_name, profile.email, avatarUrl, new Date(), new Date());
       await this.userRepository.save(user);
       const expiresAt = new Date(Date.now() + tokenResponse.expires_in * 1000);
       streamingAccount = new StreamingAccount(
