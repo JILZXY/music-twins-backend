@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Pool } from 'pg';
 import { v4 as uuidv4 } from 'uuid';
-import { PG_POOL } from '../../database/database.module';
+import { PG_POOL } from '../../../shared/infrastructure/database/postgres/postgres.module';
 import { ConversationRepository } from '../domain/conversation.repository';
 import { Conversation, ConversationListItem } from '../domain/conversation.entity';
 

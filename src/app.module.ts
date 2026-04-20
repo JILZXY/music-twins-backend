@@ -3,7 +3,8 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { DatabaseModule } from './modules/database/database.module';
+import { PostgresModule } from './shared/infrastructure/database/postgres/postgres.module';
+import { MongoModule } from './shared/infrastructure/database/mongo/mongo.module';
 import { HealthModule } from './modules/health/health.module';
 import { validateEnv } from './shared/config/env.config';
 import { GlobalExceptionFilter } from './shared/presentation/filters/global-exception.filter';
@@ -24,7 +25,8 @@ import { StreamingAccountsModule } from './modules/streaming-accounts/streaming-
       isGlobal: true,
       validate: validateEnv,
     }),
-    DatabaseModule,
+    PostgresModule,
+    MongoModule,
     HealthModule,
     UsersModule,
     StreamingAccountsModule,

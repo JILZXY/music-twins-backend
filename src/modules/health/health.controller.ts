@@ -1,6 +1,7 @@
 import { Controller, Get, Inject } from '@nestjs/common';
 import { HealthCheckService, HealthCheck } from '@nestjs/terminus';
-import { PG_POOL, MONGO_DB } from '../database/database.module';
+import { PG_POOL } from '../../shared/infrastructure/database/postgres/postgres.module';
+import { MONGO_DB } from '../../shared/infrastructure/database/mongo/mongo.module';
 import { Pool } from 'pg';
 import { Db } from 'mongodb';
 @Controller('health')

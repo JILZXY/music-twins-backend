@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Pool } from 'pg';
-import { PG_POOL } from '../../database/database.module';
+import { PG_POOL } from '../../../shared/infrastructure/database/postgres/postgres.module';
 @Injectable()
 export class UserSearchService {
   constructor(@Inject(PG_POOL) private readonly pool: Pool) {}

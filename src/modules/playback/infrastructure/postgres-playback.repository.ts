@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Pool } from 'pg';
 import { PlaybackEvent } from '../domain/playback-event.entity';
-import { PG_POOL } from '../../database/database.module';
+import { PG_POOL } from '../../../shared/infrastructure/database/postgres/postgres.module';
 export const PLAYBACK_REPOSITORY = 'PLAYBACK_REPOSITORY';
 export interface PlaybackRepository {
   save(event: PlaybackEvent): Promise<PlaybackEvent>;

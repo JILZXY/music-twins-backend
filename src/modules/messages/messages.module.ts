@@ -3,7 +3,7 @@ import { Db, ObjectId } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 import { JwtAuthGuard } from '../auth/presentation/guards/jwt-auth.guard';
 import { AuthModule } from '../auth/auth.module';
-import { MONGO_DB } from '../database/database.module';
+import { MONGO_DB } from '../../shared/infrastructure/database/mongo/mongo.module';
 import { MessagesGateway } from './presentation/messages.gateway';
 export class Message {
   constructor(

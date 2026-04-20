@@ -2,7 +2,7 @@ import { Module, Controller, Post, Get, Body, Param, Req, UseGuards, Injectable,
 import { Pool } from 'pg';
 import { v4 as uuidv4 } from 'uuid';
 import { JwtAuthGuard } from '../auth/presentation/guards/jwt-auth.guard';
-import { PG_POOL } from '../database/database.module';
+import { PG_POOL } from '../../shared/infrastructure/database/postgres/postgres.module';
 export class Note {
   constructor(
     public readonly id: string,

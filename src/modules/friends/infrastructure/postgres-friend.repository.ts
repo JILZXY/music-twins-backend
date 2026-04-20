@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { Pool } from 'pg';
 import { FriendRepository } from '../domain/friend.repository';
 import { Friendship } from '../domain/friend.entity';
-import { PG_POOL } from '../../database/database.module';
+import { PG_POOL } from '../../../shared/infrastructure/database/postgres/postgres.module';
 @Injectable()
 export class PostgresFriendRepository implements FriendRepository {
   constructor(@Inject(PG_POOL) private readonly pool: Pool) {}

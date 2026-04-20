@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Pool } from 'pg';
-import { PG_POOL } from '../../database/database.module';
+import { PG_POOL } from '../../../shared/infrastructure/database/postgres/postgres.module';
 import { FeedRepository } from '../domain/feed.repository';
 import { FeedItem, FeedUser, FeedTrack } from '../domain/feed-item.entity';
 
