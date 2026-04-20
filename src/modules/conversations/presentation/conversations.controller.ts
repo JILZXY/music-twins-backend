@@ -14,6 +14,6 @@ export class ConversationsController {
   
   @Post()
   async createConversation(@Body() body: any, @Req() req: any) {
-    return this.conversationsService.createConversation(req.user.userId, body.targetUserId, body.originPlaybackEventId);
+    return this.conversationsService.createConversation(req.user.userId, body.targetUserId);
   }
 }
