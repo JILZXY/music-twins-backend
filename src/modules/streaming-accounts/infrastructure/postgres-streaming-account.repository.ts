@@ -13,7 +13,7 @@ export class PostgresStreamingAccountRepository implements StreamingAccountRepos
     @Inject(PG_POOL) private readonly pool: Pool,
     private readonly configService: ConfigService,
   ) {
-    this.encryptionSecret = this.configService.get<string>('JWT_SECRET');
+    this.encryptionSecret = this.configService.get<string>('JWT_SECRET') || '';
   }
 
   async findByUserId(userId: string): Promise<StreamingAccount | null> {
