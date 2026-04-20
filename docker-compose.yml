@@ -27,9 +27,7 @@ services:
       - music-twins-network
     restart: unless-stopped
 
+# Redes del proyecto
 networks:
   music-twins-network:
     driver: bridge
-
-volumes:
-  # Volúmenes eliminados ya que la DB es remota
