@@ -18,7 +18,6 @@ import { FeedModule } from './modules/feed/feed.module';
 import { ConversationsModule } from './modules/conversations/conversations.module';
 import { MessagesModule } from './modules/messages/messages.module';
 import { StreamingAccountsModule } from './modules/streaming-accounts/streaming-accounts.module';
-
 @Module({
   imports: [
     ConfigModule.forRoot({

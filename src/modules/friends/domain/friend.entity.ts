@@ -1,5 +1,4 @@
 export type FriendStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED';
-
 export class Friendship {
   constructor(
     public readonly id: string,

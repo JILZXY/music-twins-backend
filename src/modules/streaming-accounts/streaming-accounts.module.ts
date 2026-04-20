@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { PostgresStreamingAccountRepository } from './infrastructure/postgres-streaming-account.repository';
 import { STREAMING_ACCOUNT_REPOSITORY } from './domain/streaming-account.repository';
-
 @Module({
   providers: [
     {

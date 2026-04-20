@@ -3,25 +3,21 @@ import { Pool } from 'pg';
 import { StreamingAccountRepository } from '../domain/streaming-account.repository';
 import { StreamingAccount } from '../domain/streaming-account.entity';
 import { PG_POOL } from '../../database/database.module';
-
 @Injectable()
 export class PostgresStreamingAccountRepository implements StreamingAccountRepository {
   constructor(@Inject(PG_POOL) private readonly pool: Pool) {}
-
   async findByUserId(userId: string): Promise<StreamingAccount | null> {
     const query = 'SELECT * FROM streaming_accounts WHERE user_id = $1';
     const result = await this.pool.query(query, [userId]);
     if (result.rows.length === 0) return null;
     return this.mapToEntity(result.rows[0]);
   }
-
   async findByProviderAccountId(providerAccountId: string): Promise<StreamingAccount | null> {
     const query = 'SELECT * FROM streaming_accounts WHERE provider_account_id = $1';
     const result = await this.pool.query(query, [providerAccountId]);
     if (result.rows.length === 0) return null;
     return this.mapToEntity(result.rows[0]);
   }
-
   async save(account: StreamingAccount): Promise<StreamingAccount> {
     const query = `
       INSERT INTO streaming_accounts (id, user_id, provider, provider_account_id, access_token, refresh_token, expires_at, created_at, updated_at) 
@@ -44,10 +40,8 @@ export class PostgresStreamingAccountRepository implements StreamingAccountRepos
       account.createdAt,
       account.updatedAt,
     ]);
-
     return this.mapToEntity(result.rows[0]);
   }
-
   private mapToEntity(row: any): StreamingAccount {
     return new StreamingAccount(
       row.id,

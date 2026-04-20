@@ -4,15 +4,12 @@ import { PlaybackEvent } from '../domain/playback-event.entity';
 import { PLAYBACK_REPOSITORY } from '../infrastructure/postgres-playback.repository';
 import type { PlaybackRepository } from '../infrastructure/postgres-playback.repository';
 import { v4 as uuidv4 } from 'uuid';
-
 @Controller('playback')
 @UseGuards(JwtAuthGuard)
 export class PlaybackController {
   constructor(@Inject(PLAYBACK_REPOSITORY) private readonly playbackRepository: PlaybackRepository) {}
-
   @Post('sync')
   async sync(@Body() body: any, @Req() req: any) {
-    // Expects structured track input from client (derived from Spotify API)
     const event = new PlaybackEvent(
       uuidv4(),
       req.user.userId,
@@ -21,7 +18,7 @@ export class PlaybackController {
       body.artist,
       body.albumName || null,
       body.albumImageUrl || null,
-      new Date(), // Or body.playedAt
+      new Date(), 
     );
     return this.playbackRepository.save(event);
   }

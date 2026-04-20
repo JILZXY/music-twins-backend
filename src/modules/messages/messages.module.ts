@@ -5,10 +5,9 @@ import { JwtAuthGuard } from '../auth/presentation/guards/jwt-auth.guard';
 import { AuthModule } from '../auth/auth.module';
 import { MONGO_DB } from '../database/database.module';
 import { MessagesGateway } from './presentation/messages.gateway';
-
 export class Message {
   constructor(
-    public readonly id: string, // UUID format to map with other domains or use ObjectId natively
+    public readonly id: string, 
     public readonly conversationId: string,
     public readonly senderId: string,
     public readonly receiverId: string,
@@ -19,15 +18,12 @@ export class Message {
     public readonly createdAt: Date,
   ) {}
 }
-
 @Injectable()
 export class MessagesRepository {
   constructor(@Inject(MONGO_DB) private readonly db: Db) {}
-
   private get collection() {
     return this.db.collection('messages');
   }
-
   async getMessagesByConversation(conversationId: string, limit: number = 50, skip: number = 0): Promise<any[]> {
     const messages = await this.collection
       .find({ conversation_id: conversationId })
@@ -35,7 +31,6 @@ export class MessagesRepository {
       .skip(skip)
       .limit(limit)
       .toArray();
-
     return messages.map(m => ({
       id: m.id || m._id.toString(),
       conversationId: m.conversation_id,
@@ -48,21 +43,17 @@ export class MessagesRepository {
       createdAt: m.created_at,
     }));
   }
-
   async markAsRead(conversationId: string, receiverId: string): Promise<number> {
     const filter = {
       conversation_id: conversationId,
       receiver_id: receiverId,
       read: false,
     };
-    
     const result = await this.collection.updateMany(filter, {
       $set: { read: true, read_at: new Date() },
     });
-
     return result.modifiedCount;
   }
-
   async save(message: Message): Promise<Message> {
     await this.collection.insertOne({
       id: message.id,
@@ -78,12 +69,10 @@ export class MessagesRepository {
     return message;
   }
 }
-
 @Controller()
 @UseGuards(JwtAuthGuard)
 export class MessagesController {
   constructor(private readonly repo: MessagesRepository) {}
-
   @Get('conversations/:id/messages')
   async getMessages(@Param('id') conversationId: string, @Query('limit') limit?: string, @Query('skip') skip?: string) {
     const l = limit ? parseInt(limit, 10) : 50;
@@ -94,14 +83,12 @@ export class MessagesController {
       nextCursor: items.length === l ? s + l : null,
     };
   }
-
   @Post('messages/read')
   async markRead(@Body() body: any, @Req() req: any) {
     const updatedCount = await this.repo.markAsRead(body.conversationId, req.user.userId);
     return { updatedCount };
   }
 }
-
 @Module({
   imports: [AuthModule],
   controllers: [MessagesController],

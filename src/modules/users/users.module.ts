@@ -3,7 +3,6 @@ import { PostgresUserRepository } from './infrastructure/postgres-user.repositor
 import { USER_REPOSITORY } from './domain/user.repository';
 import { UsersController } from './presentation/users.controller';
 import { UserSearchService } from './application/user-search.service';
-
 @Module({
   controllers: [UsersController],
   providers: [

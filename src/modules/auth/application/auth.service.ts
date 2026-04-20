@@ -8,7 +8,6 @@ import type { StreamingAccountRepository } from '../../streaming-accounts/domain
 import { User } from '../../users/domain/user.entity';
 import { StreamingAccount } from '../../streaming-accounts/domain/streaming-account.entity';
 import { v4 as uuidv4 } from 'uuid';
-
 @Injectable()
 export class AuthService {
   constructor(
@@ -17,22 +16,16 @@ export class AuthService {
     @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,
     @Inject(STREAMING_ACCOUNT_REPOSITORY) private readonly streamingAccountRepository: StreamingAccountRepository,
   ) {}
-
   getSpotifyAuthUrl(state: string, codeChallenge: string): string {
     return this.spotifyService.getAuthorizationUrl(state, codeChallenge);
   }
-
   async handleSpotifyCallback(code: string, codeVerifier: string): Promise<{ accessToken: string; user: any }> {
     const tokenResponse = await this.spotifyService.exchangeCodeForToken(code, codeVerifier);
     const profile = await this.spotifyService.getUserProfile(tokenResponse.access_token);
-
-    // Find or create streaming account & user
     let streamingAccount = await this.streamingAccountRepository.findByProviderAccountId(profile.id);
     let user: User;
-
     if (streamingAccount) {
       user = await this.userRepository.findById(streamingAccount.userId) as User;
-      // Update tokens
       const expiresAt = new Date(Date.now() + tokenResponse.expires_in * 1000);
       streamingAccount = new StreamingAccount(
         streamingAccount.id,
@@ -47,13 +40,10 @@ export class AuthService {
       );
       await this.streamingAccountRepository.save(streamingAccount);
     } else {
-      // Create new user
       const userId = uuidv4();
       const avatarUrl = profile.images && profile.images.length > 0 ? profile.images[0].url : null;
       user = new User(userId, profile.display_name, avatarUrl, new Date(), new Date());
       await this.userRepository.save(user);
-
-      // Create streaming account
       const expiresAt = new Date(Date.now() + tokenResponse.expires_in * 1000);
       streamingAccount = new StreamingAccount(
         uuidv4(),
@@ -68,11 +58,8 @@ export class AuthService {
       );
       await this.streamingAccountRepository.save(streamingAccount);
     }
-
-    // Generate JWT
     const payload = { sub: user.id };
     const accessToken = this.jwtService.sign(payload);
-
     return {
       accessToken,
       user: {
@@ -82,7 +69,6 @@ export class AuthService {
       },
     };
   }
-
   async getMe(userId: string) {
     const user = await this.userRepository.findById(userId);
     if (!user) return null;

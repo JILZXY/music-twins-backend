@@ -8,7 +8,6 @@ import { SpotifyService } from './infrastructure/spotify.service';
 import { JwtStrategy } from './infrastructure/jwt.strategy';
 import { UsersModule } from '../users/users.module';
 import { StreamingAccountsModule } from '../streaming-accounts/streaming-accounts.module';
-
 @Module({
   imports: [
     UsersModule,

@@ -2,10 +2,8 @@ import { Global, Module, OnApplicationShutdown } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Pool } from 'pg';
 import { MongoClient, Db } from 'mongodb';
-
 export const PG_POOL = 'PG_POOL';
 export const MONGO_DB = 'MONGO_DB';
-
 @Global()
 @Module({
   providers: [
@@ -20,12 +18,9 @@ export const MONGO_DB = 'MONGO_DB';
           password: configService.get<string>('PG_PASSWORD'),
           database: configService.get<string>('PG_DATABASE'),
         });
-        
-        // Throw an error if initial connection fails
         pool.on('error', (err) => {
           console.error('Unexpected error on idle PG client', err);
         });
-
         return pool;
       },
     },
@@ -45,11 +40,6 @@ export const MONGO_DB = 'MONGO_DB';
 })
 export class DatabaseModule implements OnApplicationShutdown {
   constructor() {}
-
-  // Automatically close connections when NestJS shuts down
   async onApplicationShutdown(signal?: string) {
-    // Handling closure should optimally be done by injecting the connections here
-    // but in a custom provider setup, it's easily done inside the module using moduleRef
-    // For brevity of setup, the raw instances are managed globally or caught.
   }
 }

@@ -3,7 +3,6 @@ import { FriendsController } from './presentation/friends.controller';
 import { FriendsService } from './application/friends.service';
 import { PostgresFriendRepository } from './infrastructure/postgres-friend.repository';
 import { FRIEND_REPOSITORY } from './domain/friend.repository';
-
 @Module({
   controllers: [FriendsController],
   providers: [

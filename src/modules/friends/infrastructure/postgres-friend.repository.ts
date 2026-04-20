@@ -3,27 +3,22 @@ import { Pool } from 'pg';
 import { FriendRepository } from '../domain/friend.repository';
 import { Friendship } from '../domain/friend.entity';
 import { PG_POOL } from '../../database/database.module';
-
 @Injectable()
 export class PostgresFriendRepository implements FriendRepository {
   constructor(@Inject(PG_POOL) private readonly pool: Pool) {}
-
   async findById(id: string): Promise<Friendship | null> {
     const query = 'SELECT * FROM friends WHERE id = $1';
     const result = await this.pool.query(query, [id]);
     if (result.rows.length === 0) return null;
     return this.mapToEntity(result.rows[0]);
   }
-
   async findByUsers(userId1: string, userId2: string): Promise<Friendship | null> {
     const query = 'SELECT * FROM friends WHERE (user_id = $1 AND friend_id = $2) OR (user_id = $2 AND friend_id = $1)';
     const result = await this.pool.query(query, [userId1, userId2]);
     if (result.rows.length === 0) return null;
     return this.mapToEntity(result.rows[0]);
   }
-
   async findPendingRequests(userId: string): Promise<any[]> {
-    // Shows requests received by the user
     const query = `
       SELECT f.id, f.status, f.created_at as "createdAt", u.id as "userId", u.display_name as "displayName", u.avatar_url as "avatarUrl"
       FROM friends f
@@ -33,7 +28,6 @@ export class PostgresFriendRepository implements FriendRepository {
     const result = await this.pool.query(query, [userId]);
     return result.rows;
   }
-
   async findAcceptedFriends(userId: string): Promise<any[]> {
     const query = `
       SELECT u.id, u.display_name as "displayName", u.avatar_url as "avatarUrl", f.created_at as "friendSince"
@@ -44,7 +38,6 @@ export class PostgresFriendRepository implements FriendRepository {
     const result = await this.pool.query(query, [userId]);
     return result.rows;
   }
-
   async save(friendship: Friendship): Promise<Friendship> {
     const query = `
       INSERT INTO friends (id, user_id, friend_id, status, created_at, updated_at) 
@@ -62,10 +55,8 @@ export class PostgresFriendRepository implements FriendRepository {
       friendship.createdAt,
       friendship.updatedAt,
     ]);
-
     return this.mapToEntity(result.rows[0]);
   }
-
   private mapToEntity(row: any): Friendship {
     return new Friendship(
       row.id,

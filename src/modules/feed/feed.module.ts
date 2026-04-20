@@ -2,13 +2,10 @@ import { Module, Controller, Get, Query, Req, UseGuards, Injectable, Inject } fr
 import { Pool } from 'pg';
 import { JwtAuthGuard } from '../auth/presentation/guards/jwt-auth.guard';
 import { PG_POOL } from '../database/database.module';
-
 @Injectable()
 export class FeedService {
   constructor(@Inject(PG_POOL) private readonly pool: Pool) {}
-
   async getFeed(userId: string, friendId?: string, limit: number = 20): Promise<any> {
-    // Collects playback events for user and accepted friends.
     let filterCondition = `
       pe.user_id = $1 OR pe.user_id IN (
         SELECT CASE WHEN user_id = $1 THEN friend_id ELSE user_id END
@@ -17,12 +14,10 @@ export class FeedService {
       )
     `;
     const params: any[] = [userId, limit];
-
     if (friendId) {
       filterCondition = `pe.user_id = $3`;
       params.push(friendId);
     }
-
     const query = `
       SELECT 
         pe.id AS "playbackEventId",
@@ -57,9 +52,7 @@ export class FeedService {
       ORDER BY pe.played_at DESC
       LIMIT $2
     `;
-
     const result = await this.pool.query(query, params);
-
     return {
       items: result.rows.map((row) => ({
         playbackEventId: row.playbackEventId,
@@ -79,23 +72,20 @@ export class FeedService {
         reactions: row.reactions,
         notesCount: row.notesCount,
       })),
-      nextCursor: null, // Logic for pagination/cursor can be added if needed
+      nextCursor: null, 
     };
   }
 }
-
 @Controller('feed')
 @UseGuards(JwtAuthGuard)
 export class FeedController {
   constructor(private readonly feedService: FeedService) {}
-
   @Get()
   async getFeed(@Query('friendId') friendId: string, @Query('limit') limit: string, @Req() req: any) {
     const l = limit ? parseInt(limit, 10) : 20;
     return this.feedService.getFeed(req.user.userId, friendId, l);
   }
 }
-
 @Module({
   controllers: [FeedController],
   providers: [FeedService],

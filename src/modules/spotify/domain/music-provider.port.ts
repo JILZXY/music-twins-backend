@@ -6,9 +6,7 @@ export interface Track {
   imageUrl: string | null;
   isPlaying: boolean;
 }
-
 export const MUSIC_PROVIDER_PORT = 'MUSIC_PROVIDER_PORT';
-
 export interface MusicProviderPort {
   getNowPlaying(accessToken: string): Promise<Track | null>;
   getRecentlyPlayed(accessToken: string, limit: number): Promise<Track[]>;
