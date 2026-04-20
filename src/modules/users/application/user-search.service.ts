@@ -20,7 +20,7 @@ export class UserSearchService {
         u.avatar_url as "avatarUrl",
         f.status as "friendStatus"
       FROM users u
-      LEFT JOIN friends f ON (f.user_id = $2 AND f.friend_id = u.id) OR (f.friend_id = $2 AND f.user_id = u.id)
+      LEFT JOIN friends f ON (f.user_id = $2 AND f.friend_user_id = u.id) OR (f.friend_user_id = $2 AND f.user_id = u.id)
       WHERE u.display_name ILIKE $1 AND u.id != $2
       LIMIT $3
     `;
