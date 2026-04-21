@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Query, Req, Res, UseGuards, UnauthorizedException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Query,
+  Req,
+  Res,
+  UseGuards,
+  UnauthorizedException,
+} from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { AuthService } from '../application/auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
@@ -10,9 +19,18 @@ export class AuthController {
   loginSpotify(@Res() res: Response) {
     const state = crypto.randomBytes(16).toString('hex');
     const codeVerifier = crypto.randomBytes(32).toString('hex');
-    const codeChallenge = crypto.createHash('sha256').update(codeVerifier).digest('base64url');
-    res.cookie('spotify_auth_state', state, { httpOnly: true, maxAge: 3600000 });
-    res.cookie('spotify_code_verifier', codeVerifier, { httpOnly: true, maxAge: 3600000 });
+    const codeChallenge = crypto
+      .createHash('sha256')
+      .update(codeVerifier)
+      .digest('base64url');
+    res.cookie('spotify_auth_state', state, {
+      httpOnly: true,
+      maxAge: 3600000,
+    });
+    res.cookie('spotify_code_verifier', codeVerifier, {
+      httpOnly: true,
+      maxAge: 3600000,
+    });
     const authUrl = this.authService.getSpotifyAuthUrl(state, codeChallenge);
     return res.redirect(authUrl);
   }
@@ -23,28 +41,43 @@ export class AuthController {
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    const storedState = req.cookies ? req.cookies['spotify_auth_state'] : null;
-    const codeVerifier = req.cookies ? req.cookies['spotify_code_verifier'] : null;
+    const cookies = req.cookies as Record<string, string> | undefined;
+    const storedState = cookies ? cookies['spotify_auth_state'] : null;
+    const codeVerifier = cookies ? cookies['spotify_code_verifier'] : null;
     if (state === null || state !== storedState || !codeVerifier) {
-      throw new UnauthorizedException('State mismatch or missing code verifier');
+      throw new UnauthorizedException(
+        'State mismatch or missing code verifier',
+      );
     }
     res.clearCookie('spotify_auth_state');
     res.clearCookie('spotify_code_verifier');
     try {
-      const response = await this.authService.handleSpotifyCallback(code, codeVerifier);
-      return res.json(response);
+      const response = await this.authService.handleSpotifyCallback(
+        code,
+        codeVerifier,
+      );
+
+      res.cookie('access_token', response.accessToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        path: '/',
+      });
+
+      return res.redirect(302, `${process.env.FRONTEND_URL}/feed`);
     } catch (error) {
       throw new UnauthorizedException((error as Error).message);
     }
   }
   @UseGuards(JwtAuthGuard)
   @Get('me')
-  async getMe(@Req() req: any) {
-    return this.authService.getMe(req.user.userId);
+  async getMe(@Req() req: Request & { user?: { userId: string } }) {
+    const userId = req.user?.userId as string;
+    return this.authService.getMe(userId);
   }
   @UseGuards(JwtAuthGuard)
   @Post('logout')
-  async logout(@Req() req: any, @Res() res: Response) {
+  logout(@Req() req: Request, @Res() res: Response) {
     return res.json({ success: true });
   }
 }
