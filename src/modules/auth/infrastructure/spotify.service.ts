@@ -10,6 +10,7 @@ export interface SpotifyTokenResponse {
 export interface SpotifyUserProfile {
   id: string;
   display_name: string;
+  email: string;
   images: Array<{ url: string; height: number | null; width: number | null }>;
 }
 @Injectable()

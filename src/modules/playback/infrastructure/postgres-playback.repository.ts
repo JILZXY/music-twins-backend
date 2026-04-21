@@ -11,7 +11,7 @@ export class PostgresPlaybackRepository implements PlaybackRepository {
   constructor(@Inject(PG_POOL) private readonly pool: Pool) {}
   async save(event: PlaybackEvent): Promise<PlaybackEvent> {
     const query = `
-      INSERT INTO playback_events (id, user_id, track_id, name, artist, album_name, album_image_url, played_at) 
+      INSERT INTO playback_events (id, user_id, track_id, track_name, artist_name, album_name, album_image_url, played_at) 
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
       ON CONFLICT (id) DO NOTHING
       RETURNING *;
@@ -28,6 +28,6 @@ export class PostgresPlaybackRepository implements PlaybackRepository {
     ]);
     if (result.rows.length === 0) return event; 
     const r = result.rows[0];
-    return new PlaybackEvent(r.id, r.user_id, r.track_id, r.name, r.artist, r.album_name, r.album_image_url, r.played_at);
+    return new PlaybackEvent(r.id, r.user_id, r.track_id, r.track_name, r.artist_name, r.album_name, r.album_image_url, r.played_at);
   }
 }

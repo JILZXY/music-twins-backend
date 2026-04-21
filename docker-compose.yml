@@ -9,56 +9,25 @@ services:
     ports:
       - "${PORT:-3000}:3000"
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=${NODE_ENV}
       - PORT=${PORT:-3000}
-      - PG_HOST=postgres
+      - PG_HOST=${PG_HOST}
       - PG_PORT=${PG_PORT:-5432}
       - PG_USER=${PG_USER}
       - PG_PASSWORD=${PG_PASSWORD}
       - PG_DATABASE=${PG_DATABASE}
-      - MONGO_URI=mongodb://mongo:27017/${MONGO_DATABASE}
+      - MONGO_URI=${MONGO_URI}
       - MONGO_DATABASE=${MONGO_DATABASE}
       - JWT_SECRET=${JWT_SECRET}
       - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
       - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
-      - SPOTIFY_CALLBACK_URL=${SPOTIFY_CALLBACK_URL:-http://localhost:3000/auth/spotify/callback}
-    depends_on:
-      - postgres
-      - mongo
+      - SPOTIFY_CALLBACK_URL=${SPOTIFY_CALLBACK_URL}
+      - CORS_ORIGIN=${CORS_ORIGIN}
     networks:
       - music-twins-network
     restart: unless-stopped
 
-  postgres:
-    image: postgres:15-alpine
-    container_name: music-twins-pgsql
-    environment:
-      POSTGRES_USER: ${PG_USER}
-      POSTGRES_PASSWORD: ${PG_PASSWORD}
-      POSTGRES_DB: ${PG_DATABASE}
-    ports:
-      - "${PG_PORT:-5432}:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - music-twins-network
-    restart: unless-stopped
-
-  mongo:
-    image: mongo:6
-    container_name: music-twins-mongo
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
-    networks:
-      - music-twins-network
-    restart: unless-stopped
-
+# Redes del proyecto
 networks:
   music-twins-network:
     driver: bridge
-
-volumes:
-  postgres_data:
-  mongo_data:

@@ -10,7 +10,8 @@ import {
 import { Server, Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { Logger, Inject } from '@nestjs/common';
-import { MessagesRepository, Message } from '../messages.module';
+import { MessagesRepository } from '../infrastructure/messages.repository';
+import { Message } from '../domain/message.entity';
 import { v4 as uuidv4 } from 'uuid';
 @WebSocketGateway({ cors: { origin: '*' } })
 export class MessagesGateway implements OnGatewayConnection, OnGatewayDisconnect {

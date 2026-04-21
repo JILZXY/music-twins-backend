@@ -17,11 +17,10 @@ export class ConversationsService {
       },
       lastMessage: null, 
       unreadCount: 0,
-      originPlaybackEventId: item.originPlaybackEventId,
     }));
   }
   
-  async createConversation(userId: string, targetUserId: string, originPlaybackEventId?: string) {
-    return this.repo.createOrFind(userId, targetUserId, originPlaybackEventId || null);
+  async createConversation(userId: string, targetUserId: string) {
+    return this.repo.createOrFind(userId, targetUserId);
   }
 }
