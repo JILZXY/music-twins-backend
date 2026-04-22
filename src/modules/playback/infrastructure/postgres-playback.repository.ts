@@ -5,10 +5,34 @@ import { PG_POOL } from '../../../shared/infrastructure/database/postgres/postgr
 export const PLAYBACK_REPOSITORY = 'PLAYBACK_REPOSITORY';
 export interface PlaybackRepository {
   save(event: PlaybackEvent): Promise<PlaybackEvent>;
+  getLatestForUser(userId: string): Promise<PlaybackEvent | null>;
 }
 @Injectable()
 export class PostgresPlaybackRepository implements PlaybackRepository {
   constructor(@Inject(PG_POOL) private readonly pool: Pool) {}
+  
+  async getLatestForUser(userId: string): Promise<PlaybackEvent | null> {
+    const query = `
+      SELECT * FROM playback_events 
+      WHERE user_id = $1 
+      ORDER BY played_at DESC 
+      LIMIT 1;
+    `;
+    const result = await this.pool.query(query, [userId]);
+    if (result.rows.length === 0) return null;
+    const r = result.rows[0];
+    return new PlaybackEvent(
+      r.id,
+      r.user_id,
+      r.track_id,
+      r.track_name,
+      r.artist_name,
+      r.album_name,
+      r.album_image_url,
+      r.played_at,
+    );
+  }
+
   async save(event: PlaybackEvent): Promise<PlaybackEvent> {
     const query = `
       INSERT INTO playback_events (id, user_id, track_id, track_name, artist_name, album_name, album_image_url, played_at) 

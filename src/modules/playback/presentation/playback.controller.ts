@@ -31,9 +31,17 @@ export class PlaybackController {
   })
   @Post('sync')
   async sync(@Body() body: any, @Req() req: any) {
+    const userId = req.user.userId;
+    const latestEvent = await this.playbackRepository.getLatestForUser(userId);
+    
+    // Deduplication logic: If the new track is the exact same as the latest recorded one, skip inserting.
+    if (latestEvent && latestEvent.trackId === body.trackId) {
+      return latestEvent; // Return the existing event instead of creating a duplicate
+    }
+
     const event = new PlaybackEvent(
       uuidv4(),
-      req.user.userId,
+      userId,
       body.trackId,
       body.name,
       body.artist,
