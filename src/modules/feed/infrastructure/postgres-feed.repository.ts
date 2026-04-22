@@ -124,4 +124,28 @@ export class PostgresFeedRepository implements FeedRepository {
     const result = await this.pool.query(query, [userId]);
     return result.rows;
   }
+
+  async getTrendingTracks(userId: string): Promise<any[]> {
+    const query = `
+      WITH friend_ids AS (
+        SELECT CASE WHEN user_id = $1 THEN friend_user_id ELSE user_id END as friend_id
+        FROM friends
+        WHERE (user_id = $1 OR friend_user_id = $1) AND status = 'ACCEPTED'
+      )
+      SELECT 
+        track_id as "trackId",
+        track_name as "name",
+        artist_name as "artist",
+        album_name as "albumName",
+        album_image_url as "albumImageUrl",
+        COUNT(*) as "playCount"
+      FROM playback_events
+      WHERE user_id IN (SELECT friend_id FROM friend_ids)
+      GROUP BY track_id, track_name, artist_name, album_name, album_image_url
+      ORDER BY "playCount" DESC
+      LIMIT 10
+    `;
+    const result = await this.pool.query(query, [userId]);
+    return result.rows;
+  }
 }

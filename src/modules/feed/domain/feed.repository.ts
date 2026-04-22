@@ -9,4 +9,5 @@ export interface FeedRepository {
     limit?: number,
   ): Promise<{ items: FeedItem[]; nextCursor: string | null }>;
   getFriendsSummary(userId: string): Promise<any[]>;
+  getTrendingTracks(userId: string): Promise<any[]>;
 }

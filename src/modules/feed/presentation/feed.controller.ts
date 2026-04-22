@@ -41,4 +41,9 @@ export class FeedController {
   async getFriendsSummary(@Req() req: any) {
     return this.feedService.getFriendsSummary(req.user.userId);
   }
+
+  @Get('trending')
+  async getTrendingTracks(@Req() req: any) {
+    return this.feedService.getTrendingTracks(req.user.userId);
+  }
 }

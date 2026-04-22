@@ -15,4 +15,8 @@ export class FeedService {
   async getFriendsSummary(userId: string) {
     return this.feedRepository.getFriendsSummary(userId);
   }
+
+  async getTrendingTracks(userId: string) {
+    return this.feedRepository.getTrendingTracks(userId);
+  }
 }
