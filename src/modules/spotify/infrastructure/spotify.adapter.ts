@@ -8,9 +8,14 @@ export class SpotifyAdapter implements MusicProviderPort {
   private readonly clientSecret: string;
   constructor(private readonly configService: ConfigService) {
     this.clientId = this.configService.get<string>('SPOTIFY_CLIENT_ID') || '';
-    this.clientSecret = this.configService.get<string>('SPOTIFY_CLIENT_SECRET') || '';
+    this.clientSecret =
+      this.configService.get<string>('SPOTIFY_CLIENT_SECRET') || '';
   }
-  async refreshToken(refreshToken: string): Promise<{ access_token: string; expires_in: number; refresh_token?: string }> {
+  async refreshToken(refreshToken: string): Promise<{
+    access_token: string;
+    expires_in: number;
+    refresh_token?: string;
+  }> {
     const params = new URLSearchParams({
       grant_type: 'refresh_token',
       refresh_token: refreshToken,
@@ -29,12 +34,15 @@ export class SpotifyAdapter implements MusicProviderPort {
       this.logger.error(`Failed to refresh token: ${errorBody}`);
       throw new Error(`Spotify token refresh failed`);
     }
-    return response.json() as Promise<any>;
+    return response.json();
   }
   async getNowPlaying(accessToken: string): Promise<Track | null> {
-    const response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
+    const response = await fetch(
+      'https://api.spotify.com/v1/me/player/currently-playing',
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
     if (response.status === 204 || response.status === 202) {
       return null;
     }
@@ -55,10 +63,16 @@ export class SpotifyAdapter implements MusicProviderPort {
       isPlaying: data.is_playing,
     };
   }
-  async getRecentlyPlayed(accessToken: string, limit: number = 20): Promise<Track[]> {
-    const response = await fetch(`https://api.spotify.com/v1/me/player/recently-played?limit=${limit}`, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
+  async getRecentlyPlayed(
+    accessToken: string,
+    limit: number = 20,
+  ): Promise<Track[]> {
+    const response = await fetch(
+      `https://api.spotify.com/v1/me/player/recently-played?limit=${limit}`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
     if (!response.ok) {
       const text = await response.text();
       this.logger.error(`Failed to get recently played: ${text}`);
@@ -74,14 +88,20 @@ export class SpotifyAdapter implements MusicProviderPort {
         artist: track.artists?.[0]?.name || 'Unknown Artist',
         album: track.album?.name || 'Unknown Album',
         imageUrl: track.album?.images?.[0]?.url || null,
-        isPlaying: false, 
+        isPlaying: false,
       };
     });
   }
-  async getTopTracks(accessToken: string, limit: number = 20): Promise<Track[]> {
-    const response = await fetch(`https://api.spotify.com/v1/me/top/tracks?limit=${limit}`, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
+  async getTopTracks(
+    accessToken: string,
+    limit: number = 20,
+  ): Promise<Track[]> {
+    const response = await fetch(
+      `https://api.spotify.com/v1/me/top/tracks?limit=${limit}`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
     if (!response.ok) {
       const text = await response.text();
       this.logger.error(`Failed to get top tracks: ${text}`);

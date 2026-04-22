@@ -2,7 +2,12 @@ import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
 import { SpotifyPlaybackService } from '../application/spotify-playback.service';
 import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard';
 import type { Request } from 'express';
-import { ApiTags, ApiOperation, ApiCookieAuth, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiCookieAuth,
+  ApiQuery,
+} from '@nestjs/swagger';
 
 @ApiTags('Spotify')
 @ApiCookieAuth()
@@ -18,7 +23,11 @@ export class SpotifyController {
   }
 
   @ApiOperation({ summary: 'Obtener las pistas reproducidas recientemente' })
-  @ApiQuery({ name: 'limit', required: false, description: 'Límite de pistas (por defecto 20)' })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'Límite de pistas (por defecto 20)',
+  })
   @Get('recent')
   getRecent(@Req() req: any, @Query('limit') limit?: string) {
     const parsedLimit = limit ? parseInt(limit, 10) : 20;

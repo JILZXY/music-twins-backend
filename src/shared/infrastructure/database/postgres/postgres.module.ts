@@ -29,6 +29,5 @@ export const PG_POOL = 'PG_POOL';
 })
 export class PostgresModule implements OnApplicationShutdown {
   constructor() {}
-  async onApplicationShutdown(signal?: string) {
-  }
+  async onApplicationShutdown(signal?: string) {}
 }

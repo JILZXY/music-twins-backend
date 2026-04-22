@@ -20,8 +20,10 @@ export class SpotifyService {
   private readonly redirectUri: string;
   constructor(private readonly configService: ConfigService) {
     this.clientId = this.configService.get<string>('SPOTIFY_CLIENT_ID') || '';
-    this.clientSecret = this.configService.get<string>('SPOTIFY_CLIENT_SECRET') || '';
-    this.redirectUri = this.configService.get<string>('SPOTIFY_CALLBACK_URL') || '';
+    this.clientSecret =
+      this.configService.get<string>('SPOTIFY_CLIENT_SECRET') || '';
+    this.redirectUri =
+      this.configService.get<string>('SPOTIFY_CALLBACK_URL') || '';
   }
   getAuthorizationUrl(state: string, codeChallenge: string): string {
     const scopes = [
@@ -42,7 +44,10 @@ export class SpotifyService {
     });
     return `https://accounts.spotify.com/authorize?${params.toString()}`;
   }
-  async exchangeCodeForToken(code: string, codeVerifier: string): Promise<SpotifyTokenResponse> {
+  async exchangeCodeForToken(
+    code: string,
+    codeVerifier: string,
+  ): Promise<SpotifyTokenResponse> {
     const params = new URLSearchParams({
       client_id: this.clientId,
       grant_type: 'authorization_code',

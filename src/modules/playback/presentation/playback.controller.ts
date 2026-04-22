@@ -11,10 +11,24 @@ import { ApiTags, ApiOperation, ApiCookieAuth, ApiBody } from '@nestjs/swagger';
 @Controller('playback')
 @UseGuards(JwtAuthGuard)
 export class PlaybackController {
-  constructor(@Inject(PLAYBACK_REPOSITORY) private readonly playbackRepository: PlaybackRepository) {}
+  constructor(
+    @Inject(PLAYBACK_REPOSITORY)
+    private readonly playbackRepository: PlaybackRepository,
+  ) {}
 
   @ApiOperation({ summary: 'Sincronizar evento de reproducción' })
-  @ApiBody({ schema: { type: 'object', properties: { trackId: { type: 'string' }, name: { type: 'string' }, artist: { type: 'string' }, albumName: { type: 'string' }, albumImageUrl: { type: 'string' } } } })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        trackId: { type: 'string' },
+        name: { type: 'string' },
+        artist: { type: 'string' },
+        albumName: { type: 'string' },
+        albumImageUrl: { type: 'string' },
+      },
+    },
+  })
   @Post('sync')
   async sync(@Body() body: any, @Req() req: any) {
     const event = new PlaybackEvent(
@@ -25,7 +39,7 @@ export class PlaybackController {
       body.artist,
       body.albumName || null,
       body.albumImageUrl || null,
-      new Date(), 
+      new Date(),
     );
     return this.playbackRepository.save(event);
   }

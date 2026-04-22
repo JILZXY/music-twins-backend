@@ -11,7 +11,11 @@ export class MessagesRepository {
     return this.db.collection('messages');
   }
 
-  async getMessagesByConversation(conversationId: string, limit: number = 50, skip: number = 0): Promise<any[]> {
+  async getMessagesByConversation(
+    conversationId: string,
+    limit: number = 50,
+    skip: number = 0,
+  ): Promise<any[]> {
     const messages = await this.collection
       .find({ conversation_id: conversationId })
       .sort({ created_at: -1 })
@@ -19,7 +23,7 @@ export class MessagesRepository {
       .limit(limit)
       .toArray();
 
-    return messages.map(m => ({
+    return messages.map((m) => ({
       id: m.id || m._id.toString(),
       conversationId: m.conversation_id,
       senderId: m.sender_id,
@@ -32,7 +36,10 @@ export class MessagesRepository {
     }));
   }
 
-  async markAsRead(conversationId: string, receiverId: string): Promise<number> {
+  async markAsRead(
+    conversationId: string,
+    receiverId: string,
+  ): Promise<number> {
     const filter = {
       conversation_id: conversationId,
       receiver_id: receiverId,

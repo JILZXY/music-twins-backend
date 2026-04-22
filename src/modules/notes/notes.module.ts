@@ -1,5 +1,22 @@
-import { Module, Controller, Post, Get, Body, Param, Req, UseGuards, Injectable, Inject } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiCookieAuth, ApiBody, ApiParam } from '@nestjs/swagger';
+import {
+  Module,
+  Controller,
+  Post,
+  Get,
+  Body,
+  Param,
+  Req,
+  UseGuards,
+  Injectable,
+  Inject,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiCookieAuth,
+  ApiBody,
+  ApiParam,
+} from '@nestjs/swagger';
 import { Pool } from 'pg';
 import { v4 as uuidv4 } from 'uuid';
 import { JwtAuthGuard } from '../auth/presentation/guards/jwt-auth.guard';
@@ -22,9 +39,21 @@ export class NotesRepository {
       VALUES ($1, $2, $3, $4, $5)
       RETURNING *;
     `;
-    const res = await this.pool.query(query, [note.id, note.playbackEventId, note.userId, note.content, note.createdAt]);
+    const res = await this.pool.query(query, [
+      note.id,
+      note.playbackEventId,
+      note.userId,
+      note.content,
+      note.createdAt,
+    ]);
     const r = res.rows[0];
-    return new Note(r.id, r.playback_event_id, r.user_id, r.content, r.created_at);
+    return new Note(
+      r.id,
+      r.playback_event_id,
+      r.user_id,
+      r.content,
+      r.created_at,
+    );
   }
   async findByPlaybackEvent(eventId: string): Promise<any[]> {
     const query = `
@@ -45,14 +74,31 @@ export class NotesRepository {
 export class NotesController {
   constructor(private readonly repo: NotesRepository) {}
   @ApiOperation({ summary: 'Crear una nueva nota' })
-  @ApiBody({ schema: { type: 'object', properties: { playbackEventId: { type: 'string' }, content: { type: 'string' } } } })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        playbackEventId: { type: 'string' },
+        content: { type: 'string' },
+      },
+    },
+  })
   @Post()
   async create(@Body() body: any, @Req() req: any) {
-    const n = new Note(uuidv4(), body.playbackEventId, req.user.userId, body.content, new Date());
+    const n = new Note(
+      uuidv4(),
+      body.playbackEventId,
+      req.user.userId,
+      body.content,
+      new Date(),
+    );
     return this.repo.create(n);
   }
   @ApiOperation({ summary: 'Obtener notas por ID de evento de reproducción' })
-  @ApiParam({ name: 'playbackEventId', description: 'ID del evento de reproducción' })
+  @ApiParam({
+    name: 'playbackEventId',
+    description: 'ID del evento de reproducción',
+  })
   @Get(':playbackEventId')
   async getByEvent(@Param('playbackEventId') id: string) {
     return this.repo.findByPlaybackEvent(id);

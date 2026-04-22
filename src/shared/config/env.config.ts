@@ -1,6 +1,8 @@
 import { z } from 'zod';
 export const envSchema = z.object({
-  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  NODE_ENV: z
+    .enum(['development', 'production', 'test'])
+    .default('development'),
   PORT: z.coerce.number().default(3000),
   PG_HOST: z.string(),
   PG_PORT: z.coerce.number().default(5432),
@@ -9,7 +11,7 @@ export const envSchema = z.object({
   PG_DATABASE: z.string(),
   MONGO_URI: z.string().url(),
   MONGO_DATABASE: z.string(),
-  JWT_SECRET: z.string(), 
+  JWT_SECRET: z.string(),
   SPOTIFY_CLIENT_ID: z.string().optional(),
   SPOTIFY_CLIENT_SECRET: z.string().optional(),
   SPOTIFY_CALLBACK_URL: z.string().optional(),

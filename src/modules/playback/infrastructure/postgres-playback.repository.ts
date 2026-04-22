@@ -26,8 +26,17 @@ export class PostgresPlaybackRepository implements PlaybackRepository {
       event.albumImageUrl,
       event.playedAt,
     ]);
-    if (result.rows.length === 0) return event; 
+    if (result.rows.length === 0) return event;
     const r = result.rows[0];
-    return new PlaybackEvent(r.id, r.user_id, r.track_id, r.track_name, r.artist_name, r.album_name, r.album_image_url, r.played_at);
+    return new PlaybackEvent(
+      r.id,
+      r.user_id,
+      r.track_id,
+      r.track_name,
+      r.artist_name,
+      r.album_name,
+      r.album_image_url,
+      r.played_at,
+    );
   }
 }

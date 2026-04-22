@@ -7,19 +7,28 @@ import { StreamingAccount } from '../../streaming-accounts/domain/streaming-acco
 @Injectable()
 export class SpotifyPlaybackService {
   constructor(
-    @Inject(MUSIC_PROVIDER_PORT) private readonly musicProviderPort: MusicProviderPort,
-    @Inject(STREAMING_ACCOUNT_REPOSITORY) private readonly streamingAccountRepository: StreamingAccountRepository,
+    @Inject(MUSIC_PROVIDER_PORT)
+    private readonly musicProviderPort: MusicProviderPort,
+    @Inject(STREAMING_ACCOUNT_REPOSITORY)
+    private readonly streamingAccountRepository: StreamingAccountRepository,
   ) {}
   private async getValidToken(userId: string): Promise<StreamingAccount> {
     const account = await this.streamingAccountRepository.findByUserId(userId);
     if (!account) {
       throw new UnauthorizedException('No streaming account linked');
     }
-    if (account.expiresAt && account.expiresAt.getTime() <= Date.now() + 60000) {
+    if (
+      account.expiresAt &&
+      account.expiresAt.getTime() <= Date.now() + 60000
+    ) {
       if (!account.refreshToken) {
-        throw new UnauthorizedException('Token expired and no refresh token available');
+        throw new UnauthorizedException(
+          'Token expired and no refresh token available',
+        );
       }
-      const refreshed = await this.musicProviderPort.refreshToken(account.refreshToken);
+      const refreshed = await this.musicProviderPort.refreshToken(
+        account.refreshToken,
+      );
       const newExpiresAt = new Date(Date.now() + refreshed.expires_in * 1000);
       const newAccount = new StreamingAccount(
         account.id,
@@ -46,17 +55,25 @@ export class SpotifyPlaybackService {
     }
   }
   async getRecentlyPlayed(userId: string, limit?: number): Promise<Track[]> {
-     try {
+    try {
       const account = await this.getValidToken(userId);
-      return await this.musicProviderPort.getRecentlyPlayed(account.accessToken, limit || 20);
+      return await this.musicProviderPort.getRecentlyPlayed(
+        account.accessToken,
+        limit || 20,
+      );
     } catch (e: any) {
-      throw new UnauthorizedException(`Failed to get recent tracks: ${e.message}`);
+      throw new UnauthorizedException(
+        `Failed to get recent tracks: ${e.message}`,
+      );
     }
   }
   async getTopTracks(userId: string, limit?: number): Promise<Track[]> {
     try {
       const account = await this.getValidToken(userId);
-      return await this.musicProviderPort.getTopTracks(account.accessToken, limit || 20);
+      return await this.musicProviderPort.getTopTracks(
+        account.accessToken,
+        limit || 20,
+      );
     } catch (e: any) {
       throw new UnauthorizedException(`Failed to get top tracks: ${e.message}`);
     }

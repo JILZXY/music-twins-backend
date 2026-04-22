@@ -7,8 +7,12 @@ import { FeedItem, FeedUser, FeedTrack } from '../domain/feed-item.entity';
 @Injectable()
 export class PostgresFeedRepository implements FeedRepository {
   constructor(@Inject(PG_POOL) private readonly pool: Pool) {}
-  
-  async getFeedItems(userId: string, friendId?: string, limit: number = 20): Promise<{ items: FeedItem[]; nextCursor: string | null }> {
+
+  async getFeedItems(
+    userId: string,
+    friendId?: string,
+    limit: number = 20,
+  ): Promise<{ items: FeedItem[]; nextCursor: string | null }> {
     let filterCondition = `
       pe.user_id = $1 OR pe.user_id IN (
         SELECT CASE WHEN user_id = $1 THEN friend_user_id ELSE user_id END
@@ -55,15 +59,32 @@ export class PostgresFeedRepository implements FeedRepository {
       ORDER BY pe.played_at DESC
       LIMIT $2
     `;
-    
+
     const result = await this.pool.query(query, params);
-    
-    const mappedItems = result.rows.map(row => {
-      const user = new FeedUser(row.userId, row.userDisplayName, row.userAvatarUrl);
-      const track = new FeedTrack(row.trackId, row.trackName, row.trackArtist, row.albumName, row.albumImageUrl);
-      return new FeedItem(row.playbackEventId, user, track, row.playedAt, row.reactions, parseInt(row.notesCount, 10));
+
+    const mappedItems = result.rows.map((row) => {
+      const user = new FeedUser(
+        row.userId,
+        row.userDisplayName,
+        row.userAvatarUrl,
+      );
+      const track = new FeedTrack(
+        row.trackId,
+        row.trackName,
+        row.trackArtist,
+        row.albumName,
+        row.albumImageUrl,
+      );
+      return new FeedItem(
+        row.playbackEventId,
+        user,
+        track,
+        row.playedAt,
+        row.reactions,
+        parseInt(row.notesCount, 10),
+      );
     });
-    
+
     return {
       items: mappedItems,
       nextCursor: null,
@@ -99,7 +120,7 @@ export class PostgresFeedRepository implements FeedRepository {
       WHERE u.id IN (SELECT friend_id FROM friend_ids)
       ORDER BY lp.played_at DESC NULLS LAST
     `;
-    
+
     const result = await this.pool.query(query, [userId]);
     return result.rows;
   }

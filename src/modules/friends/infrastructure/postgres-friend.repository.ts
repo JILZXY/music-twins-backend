@@ -12,8 +12,12 @@ export class PostgresFriendRepository implements FriendRepository {
     if (result.rows.length === 0) return null;
     return this.mapToEntity(result.rows[0]);
   }
-  async findByUsers(userId1: string, userId2: string): Promise<Friendship | null> {
-    const query = 'SELECT * FROM friends WHERE (user_id = $1 AND friend_user_id = $2) OR (user_id = $2 AND friend_user_id = $1)';
+  async findByUsers(
+    userId1: string,
+    userId2: string,
+  ): Promise<Friendship | null> {
+    const query =
+      'SELECT * FROM friends WHERE (user_id = $1 AND friend_user_id = $2) OR (user_id = $2 AND friend_user_id = $1)';
     const result = await this.pool.query(query, [userId1, userId2]);
     if (result.rows.length === 0) return null;
     return this.mapToEntity(result.rows[0]);

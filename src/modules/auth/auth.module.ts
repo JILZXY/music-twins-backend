@@ -17,7 +17,8 @@ import { StreamingAccountsModule } from '../streaming-accounts/streaming-account
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET') || 'defaultSecretForDevOnly',
+        secret:
+          configService.get<string>('JWT_SECRET') || 'defaultSecretForDevOnly',
         signOptions: { expiresIn: '7d' },
       }),
     }),

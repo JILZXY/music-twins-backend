@@ -14,18 +14,30 @@ export class AuthService {
     private readonly spotifyService: SpotifyService,
     private readonly jwtService: JwtService,
     @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,
-    @Inject(STREAMING_ACCOUNT_REPOSITORY) private readonly streamingAccountRepository: StreamingAccountRepository,
+    @Inject(STREAMING_ACCOUNT_REPOSITORY)
+    private readonly streamingAccountRepository: StreamingAccountRepository,
   ) {}
   getSpotifyAuthUrl(state: string, codeChallenge: string): string {
     return this.spotifyService.getAuthorizationUrl(state, codeChallenge);
   }
-  async handleSpotifyCallback(code: string, codeVerifier: string): Promise<{ accessToken: string; user: any }> {
-    const tokenResponse = await this.spotifyService.exchangeCodeForToken(code, codeVerifier);
-    const profile = await this.spotifyService.getUserProfile(tokenResponse.access_token);
-    let streamingAccount = await this.streamingAccountRepository.findByProviderAccountId(profile.id);
+  async handleSpotifyCallback(
+    code: string,
+    codeVerifier: string,
+  ): Promise<{ accessToken: string; user: any }> {
+    const tokenResponse = await this.spotifyService.exchangeCodeForToken(
+      code,
+      codeVerifier,
+    );
+    const profile = await this.spotifyService.getUserProfile(
+      tokenResponse.access_token,
+    );
+    let streamingAccount =
+      await this.streamingAccountRepository.findByProviderAccountId(profile.id);
     let user: User;
     if (streamingAccount) {
-      user = await this.userRepository.findById(streamingAccount.userId) as User;
+      user = (await this.userRepository.findById(
+        streamingAccount.userId,
+      )) as User;
       const expiresAt = new Date(Date.now() + tokenResponse.expires_in * 1000);
       streamingAccount = new StreamingAccount(
         streamingAccount.id,
@@ -39,9 +51,12 @@ export class AuthService {
         new Date(),
       );
       await this.streamingAccountRepository.save(streamingAccount);
-      
+
       // Refresh user info
-      const avatarUrl = profile.images && profile.images.length > 0 ? profile.images[0].url : user.avatarUrl;
+      const avatarUrl =
+        profile.images && profile.images.length > 0
+          ? profile.images[0].url
+          : user.avatarUrl;
       const updatedUser = new User(
         user.id,
         user.spotifyId,
@@ -49,14 +64,25 @@ export class AuthService {
         profile.email || user.email,
         avatarUrl,
         user.createdAt,
-        new Date()
+        new Date(),
       );
       await this.userRepository.save(updatedUser);
       user = updatedUser;
     } else {
       const userId = uuidv4();
-      const avatarUrl = profile.images && profile.images.length > 0 ? profile.images[0].url : null;
-      user = new User(userId, profile.id, profile.display_name, profile.email, avatarUrl, new Date(), new Date());
+      const avatarUrl =
+        profile.images && profile.images.length > 0
+          ? profile.images[0].url
+          : null;
+      user = new User(
+        userId,
+        profile.id,
+        profile.display_name,
+        profile.email,
+        avatarUrl,
+        new Date(),
+        new Date(),
+      );
       await this.userRepository.save(user);
       const expiresAt = new Date(Date.now() + tokenResponse.expires_in * 1000);
       streamingAccount = new StreamingAccount(
@@ -86,12 +112,15 @@ export class AuthService {
   async getMe(userId: string) {
     const user = await this.userRepository.findById(userId);
     if (!user) return null;
-    const streamingAccount = await this.streamingAccountRepository.findByUserId(userId);
+    const streamingAccount =
+      await this.streamingAccountRepository.findByUserId(userId);
     return {
       id: user.id,
       displayName: user.displayName,
       avatarUrl: user.avatarUrl,
-      hasSpotifyLinked: !!(streamingAccount && streamingAccount.provider === 'SPOTIFY'),
+      hasSpotifyLinked: !!(
+        streamingAccount && streamingAccount.provider === 'SPOTIFY'
+      ),
     };
   }
 }

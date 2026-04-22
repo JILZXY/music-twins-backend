@@ -24,7 +24,9 @@ export class HealthController {
           await this.pgPool.query('SELECT 1');
           return { postgres: { status: 'up' } };
         } catch (e) {
-          return { postgres: { status: 'down', message: (e as Error).message } };
+          return {
+            postgres: { status: 'down', message: (e as Error).message },
+          };
         }
       },
       async () => {

@@ -13,10 +13,10 @@ export const MONGO_DB = 'MONGO_DB';
       useFactory: async (configService: ConfigService) => {
         const uri = configService.get<string>('MONGO_URI')!;
         const dbName = configService.get<string>('MONGO_DATABASE');
-        
+
         const client = new MongoClient(uri);
         await client.connect();
-        
+
         return client.db(dbName);
       },
     },
@@ -25,6 +25,5 @@ export const MONGO_DB = 'MONGO_DB';
 })
 export class MongoModule implements OnApplicationShutdown {
   constructor() {}
-  async onApplicationShutdown(signal?: string) {
-  }
+  async onApplicationShutdown(signal?: string) {}
 }

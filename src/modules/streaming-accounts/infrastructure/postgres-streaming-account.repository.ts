@@ -27,12 +27,17 @@ export class PostgresStreamingAccountRepository implements StreamingAccountRepos
       FROM streaming_accounts 
       WHERE user_id = $1
     `;
-    const result = await this.pool.query(query, [userId, this.encryptionSecret]);
+    const result = await this.pool.query(query, [
+      userId,
+      this.encryptionSecret,
+    ]);
     if (result.rows.length === 0) return null;
     return this.mapToEntity(result.rows[0]);
   }
 
-  async findByProviderAccountId(providerAccountId: string): Promise<StreamingAccount | null> {
+  async findByProviderAccountId(
+    providerAccountId: string,
+  ): Promise<StreamingAccount | null> {
     const query = `
       SELECT 
         id, user_id, provider, provider_user_id, 
@@ -43,7 +48,10 @@ export class PostgresStreamingAccountRepository implements StreamingAccountRepos
       FROM streaming_accounts 
       WHERE provider_user_id = $1
     `;
-    const result = await this.pool.query(query, [providerAccountId, this.encryptionSecret]);
+    const result = await this.pool.query(query, [
+      providerAccountId,
+      this.encryptionSecret,
+    ]);
     if (result.rows.length === 0) return null;
     return this.mapToEntity(result.rows[0]);
   }

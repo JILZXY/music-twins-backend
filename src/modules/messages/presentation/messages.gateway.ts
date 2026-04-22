@@ -14,7 +14,9 @@ import { MessagesRepository } from '../infrastructure/messages.repository';
 import { Message } from '../domain/message.entity';
 import { v4 as uuidv4 } from 'uuid';
 @WebSocketGateway({ cors: { origin: '*' } })
-export class MessagesGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class MessagesGateway
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer()
   server: Server;
   private readonly logger = new Logger(MessagesGateway.name);
@@ -23,13 +25,18 @@ export class MessagesGateway implements OnGatewayConnection, OnGatewayDisconnect
     private readonly messagesRepo: MessagesRepository,
   ) {}
   handleConnection(client: Socket) {
-    this.logger.log(`Client connected: ${client.id}. Waiting for AUTH message.`);
+    this.logger.log(
+      `Client connected: ${client.id}. Waiting for AUTH message.`,
+    );
   }
   handleDisconnect(client: Socket) {
     this.logger.log(`Client disconnected: ${client.id}`);
   }
   @SubscribeMessage('message')
-  async handleMessage(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+  async handleMessage(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: Socket,
+  ) {
     if (!data || !data.type) return;
     try {
       switch (data.type) {
@@ -62,7 +69,10 @@ export class MessagesGateway implements OnGatewayConnection, OnGatewayDisconnect
   private async handleMessageSend(client: Socket, payload: any) {
     const senderId = client.data.userId;
     if (!senderId) {
-      client.emit('message', { type: 'AUTH_ERROR', message: 'Not authenticated' });
+      client.emit('message', {
+        type: 'AUTH_ERROR',
+        message: 'Not authenticated',
+      });
       return;
     }
     const { conversationId, toUserId, content, playbackEventId } = payload;

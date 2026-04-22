@@ -1,5 +1,22 @@
-import { Module, Controller, Post, Get, Body, Param, Req, UseGuards, Injectable, Inject } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiCookieAuth, ApiBody, ApiParam } from '@nestjs/swagger';
+import {
+  Module,
+  Controller,
+  Post,
+  Get,
+  Body,
+  Param,
+  Req,
+  UseGuards,
+  Injectable,
+  Inject,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiCookieAuth,
+  ApiBody,
+  ApiParam,
+} from '@nestjs/swagger';
 import { Pool } from 'pg';
 import { v4 as uuidv4 } from 'uuid';
 import { JwtAuthGuard } from '../auth/presentation/guards/jwt-auth.guard';
@@ -23,10 +40,22 @@ export class ReactionsRepository {
       ON CONFLICT (playback_event_id, user_id, emoji) DO NOTHING
       RETURNING *;
     `;
-    const res = await this.pool.query(query, [reaction.id, reaction.playbackEventId, reaction.userId, reaction.emoji, reaction.createdAt]);
-    if (res.rows.length === 0) return reaction; 
+    const res = await this.pool.query(query, [
+      reaction.id,
+      reaction.playbackEventId,
+      reaction.userId,
+      reaction.emoji,
+      reaction.createdAt,
+    ]);
+    if (res.rows.length === 0) return reaction;
     const r = res.rows[0];
-    return new Reaction(r.id, r.playback_event_id, r.user_id, r.emoji, r.created_at);
+    return new Reaction(
+      r.id,
+      r.playback_event_id,
+      r.user_id,
+      r.emoji,
+      r.created_at,
+    );
   }
   async findByPlaybackEvent(eventId: string): Promise<any[]> {
     const query = `SELECT emoji, COUNT(*) as count FROM reactions WHERE playback_event_id = $1 GROUP BY emoji`;
@@ -41,14 +70,33 @@ export class ReactionsRepository {
 export class ReactionsController {
   constructor(private readonly repo: ReactionsRepository) {}
   @ApiOperation({ summary: 'Crear una reacción a un evento de reproducción' })
-  @ApiBody({ schema: { type: 'object', properties: { playbackEventId: { type: 'string' }, emoji: { type: 'string' } } } })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        playbackEventId: { type: 'string' },
+        emoji: { type: 'string' },
+      },
+    },
+  })
   @Post()
   async create(@Body() body: any, @Req() req: any) {
-    const r = new Reaction(uuidv4(), body.playbackEventId, req.user.userId, body.emoji, new Date());
+    const r = new Reaction(
+      uuidv4(),
+      body.playbackEventId,
+      req.user.userId,
+      body.emoji,
+      new Date(),
+    );
     return this.repo.create(r);
   }
-  @ApiOperation({ summary: 'Obtener reacciones por ID de evento de reproducción' })
-  @ApiParam({ name: 'playbackEventId', description: 'ID del evento de reproducción' })
+  @ApiOperation({
+    summary: 'Obtener reacciones por ID de evento de reproducción',
+  })
+  @ApiParam({
+    name: 'playbackEventId',
+    description: 'ID del evento de reproducción',
+  })
   @Get(':playbackEventId')
   async getByEvent(@Param('playbackEventId') id: string) {
     return this.repo.findByPlaybackEvent(id);

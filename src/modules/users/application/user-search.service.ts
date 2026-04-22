@@ -4,7 +4,11 @@ import { PG_POOL } from '../../../shared/infrastructure/database/postgres/postgr
 @Injectable()
 export class UserSearchService {
   constructor(@Inject(PG_POOL) private readonly pool: Pool) {}
-  async searchUsers(query: string, currentUserId: string, limit: number = 20): Promise<any[]> {
+  async searchUsers(
+    query: string,
+    currentUserId: string,
+    limit: number = 20,
+  ): Promise<any[]> {
     if (!query || query.trim() === '') return [];
     const sql = `
       SELECT id, display_name as "displayName", avatar_url as "avatarUrl"
@@ -12,7 +16,11 @@ export class UserSearchService {
       WHERE display_name ILIKE $1 AND id != $2
       LIMIT $3
     `;
-    const result = await this.pool.query(sql, [`%${query}%`, currentUserId, limit]);
+    const result = await this.pool.query(sql, [
+      `%${query}%`,
+      currentUserId,
+      limit,
+    ]);
     const enhancedSql = `
       SELECT 
         u.id, 
@@ -24,7 +32,11 @@ export class UserSearchService {
       WHERE u.display_name ILIKE $1 AND u.id != $2
       LIMIT $3
     `;
-    const advancedResult = await this.pool.query(enhancedSql, [`%${query}%`, currentUserId, limit]);
+    const advancedResult = await this.pool.query(enhancedSql, [
+      `%${query}%`,
+      currentUserId,
+      limit,
+    ]);
     return advancedResult.rows.map((r: any) => ({
       id: r.id,
       displayName: r.displayName,
