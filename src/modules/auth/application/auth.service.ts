@@ -117,7 +117,9 @@ export class AuthService {
     return {
       id: user.id,
       displayName: user.displayName,
+      email: user.email,
       avatarUrl: user.avatarUrl,
+      createdAt: user.createdAt,
       hasSpotifyLinked: !!(
         streamingAccount && streamingAccount.provider === 'SPOTIFY'
       ),
