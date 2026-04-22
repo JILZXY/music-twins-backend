@@ -19,6 +19,9 @@ El sistema se basa en un modelo hibrido de persistencia gobernado por clientes n
 
 ## Endpoints de la API
 
+La documentación interactiva de la API (Swagger UI) está disponible una vez levantado el servidor en el endpoint:
+- GET /api/docs
+
 A continuacion, la lista de rutas REST disponibles en la plataforma (Cuentan con guardias de seguridad JWT exceptuando las rutas de login publicas o health testing):
 
 ### Sistema (Health check)
@@ -94,6 +97,7 @@ JWT_SECRET=super_secret_music_twins_key_2026
 SPOTIFY_CLIENT_ID=tu_client_id_obtenido_en_spotify_dev
 SPOTIFY_CLIENT_SECRET=tu_client_secret_obtenido_en_spotify_dev
 SPOTIFY_CALLBACK_URL=http://localhost:3000/auth/spotify/callback
+FRONTEND_URL=http://localhost:3000
 ```
 
 ### 2. Levantar los Servicios

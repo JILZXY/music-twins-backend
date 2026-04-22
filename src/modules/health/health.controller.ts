@@ -4,6 +4,9 @@ import { PG_POOL } from '../../shared/infrastructure/database/postgres/postgres.
 import { MONGO_DB } from '../../shared/infrastructure/database/mongo/mongo.module';
 import { Pool } from 'pg';
 import { Db } from 'mongodb';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
+
+@ApiTags('Health')
 @Controller('health')
 export class HealthController {
   constructor(
@@ -11,6 +14,7 @@ export class HealthController {
     @Inject(PG_POOL) private readonly pgPool: Pool,
     @Inject(MONGO_DB) private readonly mongoDb: Db,
   ) {}
+  @ApiOperation({ summary: 'Verificar el estado de las bases de datos' })
   @Get()
   @HealthCheck()
   async check() {

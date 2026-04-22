@@ -12,9 +12,15 @@ import type { Request, Response } from 'express';
 import { AuthService } from '../application/auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import * as crypto from 'crypto';
+import { ApiTags, ApiOperation, ApiResponse, ApiCookieAuth } from '@nestjs/swagger';
+
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  @ApiOperation({ summary: 'Iniciar login con Spotify' })
+  @ApiResponse({ status: 302, description: 'Redirige a la página de autorización de Spotify.' })
   @Get('spotify/login')
   loginSpotify(@Res() res: Response) {
     const state = crypto.randomBytes(16).toString('hex');
@@ -34,6 +40,9 @@ export class AuthController {
     const authUrl = this.authService.getSpotifyAuthUrl(state, codeChallenge);
     return res.redirect(authUrl);
   }
+
+  @ApiOperation({ summary: 'Callback de Spotify Auth' })
+  @ApiResponse({ status: 302, description: 'Redirige al frontend con el token en la URL.' })
   @Get('spotify/callback')
   async callbackSpotify(
     @Query('code') code: string,
@@ -52,29 +61,28 @@ export class AuthController {
     res.clearCookie('spotify_auth_state');
     res.clearCookie('spotify_code_verifier');
     try {
-      const response = await this.authService.handleSpotifyCallback(
-        code,
-        codeVerifier,
-      );
-
-      res.cookie('access_token', response.accessToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'none',
-        path: '/',
-      });
-
-      return res.redirect(302, `${process.env.FRONTEND_URL}/feed`);
+      const response = await this.authService.handleSpotifyCallback(code, codeVerifier);
+      
+      const frontendUrl = process.env.CORS_ORIGIN?.split(',')[0] || 'http://localhost:3000';
+      return res.redirect(`${frontendUrl}/auth-loading?token=${response.accessToken}`);
     } catch (error) {
       throw new UnauthorizedException((error as Error).message);
     }
   }
+
+  @ApiCookieAuth()
+  @ApiOperation({ summary: 'Obtener perfil del usuario autenticado' })
+  @ApiResponse({ status: 200, description: 'Perfil de usuario retornado.' })
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async getMe(@Req() req: Request & { user?: { userId: string } }) {
     const userId = req.user?.userId as string;
     return this.authService.getMe(userId);
   }
+
+  @ApiCookieAuth()
+  @ApiOperation({ summary: 'Cerrar sesión' })
+  @ApiResponse({ status: 200, description: 'Sesión cerrada exitosamente.' })
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   logout(@Req() req: Request, @Res() res: Response) {

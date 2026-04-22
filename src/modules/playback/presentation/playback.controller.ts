@@ -4,10 +4,17 @@ import { PlaybackEvent } from '../domain/playback-event.entity';
 import { PLAYBACK_REPOSITORY } from '../infrastructure/postgres-playback.repository';
 import type { PlaybackRepository } from '../infrastructure/postgres-playback.repository';
 import { v4 as uuidv4 } from 'uuid';
+import { ApiTags, ApiOperation, ApiCookieAuth, ApiBody } from '@nestjs/swagger';
+
+@ApiTags('Playback')
+@ApiCookieAuth()
 @Controller('playback')
 @UseGuards(JwtAuthGuard)
 export class PlaybackController {
   constructor(@Inject(PLAYBACK_REPOSITORY) private readonly playbackRepository: PlaybackRepository) {}
+
+  @ApiOperation({ summary: 'Sincronizar evento de reproducción' })
+  @ApiBody({ schema: { type: 'object', properties: { trackId: { type: 'string' }, name: { type: 'string' }, artist: { type: 'string' }, albumName: { type: 'string' }, albumImageUrl: { type: 'string' } } } })
   @Post('sync')
   async sync(@Body() body: any, @Req() req: any) {
     const event = new PlaybackEvent(
