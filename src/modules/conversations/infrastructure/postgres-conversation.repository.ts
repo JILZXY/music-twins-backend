@@ -56,7 +56,7 @@ export class PostgresConversationRepository implements ConversationRepository {
         u.id as "userId",
         u.display_name as "userDisplayName",
         u.avatar_url as "userAvatarUrl",
-        m.content as "lastMessage"
+        COALESCE(m.content, '[Canción compartida]') as "lastMessage"
       FROM conversations c
       JOIN users u ON (u.id = CASE WHEN c.user1_id = $1 THEN c.user2_id ELSE c.user1_id END)
       LEFT JOIN LATERAL (
