@@ -32,7 +32,9 @@ export class AuthController {
     res.clearCookie('spotify_code_verifier');
     try {
       const response = await this.authService.handleSpotifyCallback(code, codeVerifier);
-      return res.json(response);
+      
+      const frontendUrl = process.env.CORS_ORIGIN?.split(',')[0] || 'http://localhost:3000';
+      return res.redirect(`${frontendUrl}/auth-loading?token=${response.accessToken}`);
     } catch (error) {
       throw new UnauthorizedException((error as Error).message);
     }

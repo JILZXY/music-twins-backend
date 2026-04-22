@@ -13,8 +13,13 @@ async function bootstrap() {
   app.use(helmet());
   app.use(cookieParser());
   
+  const allowedOrigins = process.env.CORS_ORIGIN?.split(',') || [];
+  if (!allowedOrigins.includes('http://localhost:3000')) {
+    allowedOrigins.push('http://localhost:3000');
+  }
+
   app.enableCors({
-    origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000'],
+    origin: allowedOrigins,
     credentials: true,
   });
   
