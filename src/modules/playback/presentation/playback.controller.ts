@@ -34,9 +34,15 @@ export class PlaybackController {
     const userId = req.user.userId;
     const latestEvent = await this.playbackRepository.getLatestForUser(userId);
     
-    // Deduplication logic: If the new track is the exact same as the latest recorded one, skip inserting.
-    if (latestEvent && latestEvent.trackId === body.trackId) {
-      return latestEvent; // Return the existing event instead of creating a duplicate
+    // Normalizar IDs para comparación (quitar prefijo spotify:track: si existe)
+    const normalizeId = (id: string) => id?.includes(':') ? id.split(':').pop() : id;
+    const incomingId = normalizeId(body.trackId);
+    const existingId = latestEvent ? normalizeId(latestEvent.trackId) : null;
+
+    console.log(`[PlaybackSync] Usuario: ${userId} - Comparando: ${existingId} vs ${incomingId}`);
+
+    if (existingId === incomingId) {
+      return latestEvent;
     }
 
     const event = new PlaybackEvent(
