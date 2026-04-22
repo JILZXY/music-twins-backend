@@ -15,8 +15,12 @@ export class FeedController {
   @ApiQuery({ name: 'friendId', required: false, description: 'ID del amigo para filtrar' })
   @ApiQuery({ name: 'limit', required: false, description: 'Límite de resultados (por defecto 20)' })
   @Get()
-  async getFeed(@Query('friendId') friendId: string, @Query('limit') limit: string, @Req() req: any) {
     const l = limit ? parseInt(limit, 10) : 20;
     return this.feedService.getFeed(req.user.userId, friendId, l);
+  }
+
+  @Get('summary')
+  async getFriendsSummary(@Req() req: any) {
+    return this.feedService.getFriendsSummary(req.user.userId);
   }
 }

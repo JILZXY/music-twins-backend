@@ -78,4 +78,26 @@ export class SpotifyAdapter implements MusicProviderPort {
       };
     });
   }
+  async getTopTracks(accessToken: string, limit: number = 20): Promise<Track[]> {
+    const response = await fetch(`https://api.spotify.com/v1/me/top/tracks?limit=${limit}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    if (!response.ok) {
+      const text = await response.text();
+      this.logger.error(`Failed to get top tracks: ${text}`);
+      throw new Error(`Spotify top tracks fetch failed`);
+    }
+    const data = await response.json();
+    if (!data.items) return [];
+    return data.items.map((track: any) => {
+      return {
+        trackId: track.id,
+        name: track.name,
+        artist: track.artists?.[0]?.name || 'Unknown Artist',
+        album: track.album?.name || 'Unknown Album',
+        imageUrl: track.album?.images?.[0]?.url || null,
+        isPlaying: false,
+      };
+    });
+  }
 }

@@ -24,4 +24,9 @@ export class SpotifyController {
     const parsedLimit = limit ? parseInt(limit, 10) : 20;
     return this.spotifyService.getRecentlyPlayed(req.user.userId, parsedLimit);
   }
+  @Get('top-tracks')
+  getTopTracks(@Req() req: any, @Query('limit') limit?: string) {
+    const parsedLimit = limit ? parseInt(limit, 10) : 20;
+    return this.spotifyService.getTopTracks(req.user.userId, parsedLimit);
+  }
 }

@@ -69,4 +69,38 @@ export class PostgresFeedRepository implements FeedRepository {
       nextCursor: null,
     };
   }
+
+  async getFriendsSummary(userId: string): Promise<any[]> {
+    const query = `
+      WITH friend_ids AS (
+        SELECT CASE WHEN user_id = $1 THEN friend_user_id ELSE user_id END as friend_id
+        FROM friends
+        WHERE (user_id = $1 OR friend_user_id = $1) AND status = 'ACCEPTED'
+      ),
+      latest_playback AS (
+        SELECT 
+          pe.user_id,
+          pe.track_name,
+          pe.artist_name,
+          pe.played_at,
+          ROW_NUMBER() OVER(PARTITION BY pe.user_id ORDER BY pe.played_at DESC) as rn
+        FROM playback_events pe
+        WHERE pe.user_id IN (SELECT friend_id FROM friend_ids)
+      )
+      SELECT 
+        u.id,
+        u.display_name as "displayName",
+        u.avatar_url as "avatarUrl",
+        lp.track_name as "trackName",
+        lp.artist_name as "artistName",
+        lp.played_at as "playedAt"
+      FROM users u
+      LEFT JOIN latest_playback lp ON lp.user_id = u.id AND lp.rn = 1
+      WHERE u.id IN (SELECT friend_id FROM friend_ids)
+      ORDER BY lp.played_at DESC NULLS LAST
+    `;
+    
+    const result = await this.pool.query(query, [userId]);
+    return result.rows;
+  }
 }

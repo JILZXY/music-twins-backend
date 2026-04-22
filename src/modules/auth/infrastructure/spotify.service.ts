@@ -29,6 +29,7 @@ export class SpotifyService {
       'user-read-email',
       'user-read-currently-playing',
       'user-read-recently-played',
+      'user-top-read',
     ].join(' ');
     const params = new URLSearchParams({
       response_type: 'code',

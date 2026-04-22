@@ -9,4 +9,8 @@ export class FeedService {
   async getFeed(userId: string, friendId?: string, limit: number = 20) {
     return this.feedRepository.getFeedItems(userId, friendId, limit);
   }
+
+  async getFriendsSummary(userId: string) {
+    return this.feedRepository.getFriendsSummary(userId);
+  }
 }

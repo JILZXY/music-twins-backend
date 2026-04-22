@@ -53,4 +53,12 @@ export class SpotifyPlaybackService {
       throw new UnauthorizedException(`Failed to get recent tracks: ${e.message}`);
     }
   }
+  async getTopTracks(userId: string, limit?: number): Promise<Track[]> {
+    try {
+      const account = await this.getValidToken(userId);
+      return await this.musicProviderPort.getTopTracks(account.accessToken, limit || 20);
+    } catch (e: any) {
+      throw new UnauthorizedException(`Failed to get top tracks: ${e.message}`);
+    }
+  }
 }

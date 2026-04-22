@@ -39,6 +39,20 @@ export class AuthService {
         new Date(),
       );
       await this.streamingAccountRepository.save(streamingAccount);
+      
+      // Refresh user info
+      const avatarUrl = profile.images && profile.images.length > 0 ? profile.images[0].url : user.avatarUrl;
+      const updatedUser = new User(
+        user.id,
+        user.spotifyId,
+        profile.display_name || user.displayName,
+        profile.email || user.email,
+        avatarUrl,
+        user.createdAt,
+        new Date()
+      );
+      await this.userRepository.save(updatedUser);
+      user = updatedUser;
     } else {
       const userId = uuidv4();
       const avatarUrl = profile.images && profile.images.length > 0 ? profile.images[0].url : null;
