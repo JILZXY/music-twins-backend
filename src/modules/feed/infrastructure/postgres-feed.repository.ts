@@ -140,7 +140,7 @@ export class PostgresFeedRepository implements FeedRepository {
         album_image_url as "albumImageUrl",
         COUNT(*) as "playCount"
       FROM playback_events
-      WHERE user_id IN (SELECT friend_id FROM friend_ids)
+      WHERE user_id = $1 OR user_id IN (SELECT friend_id FROM friend_ids)
       GROUP BY track_id, track_name, artist_name, album_name, album_image_url
       ORDER BY "playCount" DESC
       LIMIT 10

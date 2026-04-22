@@ -15,5 +15,6 @@ export class ConversationListItem {
     public readonly userId: string,
     public readonly userDisplayName: string,
     public readonly userAvatarUrl: string | null,
+    public readonly lastMessage: string | null = null,
   ) {}
 }

@@ -18,7 +18,7 @@ export class ConversationsService {
         displayName: item.userDisplayName,
         avatarUrl: item.userAvatarUrl,
       },
-      lastMessage: null,
+      lastMessage: item.lastMessage,
       unreadCount: 0,
     }));
   }

@@ -55,9 +55,15 @@ export class PostgresConversationRepository implements ConversationRepository {
         c.updated_at as "updatedAt",
         u.id as "userId",
         u.display_name as "userDisplayName",
-        u.avatar_url as "userAvatarUrl"
+        u.avatar_url as "userAvatarUrl",
+        m.content as "lastMessage"
       FROM conversations c
       JOIN users u ON (u.id = CASE WHEN c.user1_id = $1 THEN c.user2_id ELSE c.user1_id END)
+      LEFT JOIN LATERAL (
+        SELECT content FROM messages 
+        WHERE conversation_id = c.id 
+        ORDER BY created_at DESC LIMIT 1
+      ) m ON true
       WHERE c.user1_id = $1 OR c.user2_id = $1
       ORDER BY c.updated_at DESC
     `;
@@ -70,6 +76,7 @@ export class PostgresConversationRepository implements ConversationRepository {
           row.userId,
           row.userDisplayName,
           row.userAvatarUrl,
+          row.lastMessage,
         ),
     );
   }
